@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
+class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol, AlertPresenterDelegate {
     // MARK: - Lifecycle
     
     @IBOutlet private var imageView: UIImageView!
@@ -9,51 +9,38 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     private var alertPresenter: AlertPresenterProtocol?
-    private var numberOfGame = 0
-    private var statisticService: StatisticService?
     private var presenter: MovieQuizPresenter!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenter(delegate: self)
         presenter = MovieQuizPresenter(viewController: self)
-        statisticService = StatisticServiceImplementation()
         showLoadingIndicator()
     }
     
     func show(quiz step: QuizStepViewModel) {
+        self.imageView.layer.borderColor = UIColor.ypBlack.cgColor
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
         // здесь мы заполняем нашу картинку, текст и счётчик данными
     }
-    
+
     func show(quiz result: QuizResultsViewModel) {
         let alertModel = AlertModel(title: result.title, text: result.text, buttonText: result.buttonText, completion: { [weak self] in
             guard let self = self else { return }
             self.presenter.restartGame()
-            // заново показываем первый вопрос
-            //self.questionFactory?.requestNextQuestion()
             self.setEnabledButtons(isEnabled: true)
             
         })
         self.alertPresenter?.showAlert(model: alertModel)
     }
     
-    func showAnswerResult(isCorrect: Bool) {
-        
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
-        
+    func highlightImageBorder(isCorrectAnswer: Bool) {
         setEnabledButtons(isEnabled: false)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.imageView.layer.borderColor = UIColor.ypBlack.cgColor
-            self.presenter.showNextQuestionOrResults()
-        }
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
     }
     
     @IBOutlet private weak var yesButton: UIButton!
@@ -79,7 +66,6 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
     
     func hideLoadingIndicator() {
         activityIndicator.isHidden = true // говорим, что индикатор загрузки не скрыт
-        activityIndicator.startAnimating() // включаем анимацию
     }
     
     func showNetworkError(message: String) {
@@ -92,8 +78,8 @@ final class MovieQuizViewController: UIViewController, AlertPresenterDelegate {
             guard let self = self else { return }
             
             self.presenter.restartGame()
+            self.presenter.questionFactory?.loadData()//при нажатии на "Попробовать еще раз" запускается загрузка данных
         })
-        
         self.alertPresenter?.showAlert(model: model)
     }
 }

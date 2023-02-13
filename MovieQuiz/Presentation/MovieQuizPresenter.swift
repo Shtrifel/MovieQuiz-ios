@@ -8,16 +8,20 @@
 import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
+    
     private weak var viewController: MovieQuizViewController?
-    private var questionFactory: QuestionFactoryProtocol?
-    private var statisticService: StatisticService?
-    let questionsAmount: Int = 10
+    var questionFactory: QuestionFactoryProtocol?
+    private let statisticService: StatisticService!
+    
+    private let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
-    var currentQuestion: QuizQuestion?
-    var correctAnswers: Int = 0
+    private var currentQuestion: QuizQuestion?
+    private var correctAnswers: Int = 0
     
     init(viewController: MovieQuizViewController) {
          self.viewController = viewController
+        
+         statisticService = StatisticServiceImplementation()
          questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
          questionFactory?.loadData()
          viewController.showLoadingIndicator()
@@ -55,7 +59,18 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         )
     }
     
-    func showNextQuestionOrResults() {
+    private func showAnswerResult(isCorrect: Bool) {
+        
+        didAnswer(isCorrectAnswer: isCorrect)
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.showNextQuestionOrResults()
+        }
+    }
+    
+    private func showNextQuestionOrResults() {
         if self.isLastQuestion() {
             guard let statisticService = statisticService else { return }
             statisticService.store(correct: correctAnswers, total: questionsAmount)
@@ -112,6 +127,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         
         let givenAnswer = isYes
         
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
 }
