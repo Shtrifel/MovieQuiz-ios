@@ -1,6 +1,6 @@
 import UIKit
 
-class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol, AlertPresenterDelegate {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol, AlertPresenterDelegate {
     // MARK: - Lifecycle
     
     @IBOutlet private var imageView: UIImageView!
@@ -60,12 +60,11 @@ class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol
     }
     
     func showLoadingIndicator() {
-        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
         activityIndicator.startAnimating() // включаем анимацию
     }
     
     func hideLoadingIndicator() {
-        activityIndicator.isHidden = true // говорим, что индикатор загрузки не скрыт
+        activityIndicator.stopAnimating() // убрать
     }
     
     func showNetworkError(message: String) {
