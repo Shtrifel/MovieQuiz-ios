@@ -8,33 +8,33 @@
 import XCTest
 @testable import MovieQuiz
 
-class MovieQuizViewControllerMock: MovieQuizViewController {// через протокол не присваивалась переменная sut, добавил прямое наследование
+final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
     
-    override func show(quiz step: QuizStepViewModel) {
-    
-    }
-    
-    override func show(quiz result: QuizResultsViewModel) {
+   func show(quiz step: QuizStepViewModel) {
     
     }
     
-    override func highlightImageBorder(isCorrectAnswer: Bool) {
+    func show(quiz result: QuizResultsViewModel) {
     
     }
     
-    override func setEnabledButtons(isEnabled: Bool) {
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+    
+    }
+    
+    func setEnabledButtons(isEnabled: Bool) {
         
     }
     
-    override func showLoadingIndicator() {
+    func showLoadingIndicator() {
     
     }
     
-    override func hideLoadingIndicator() {
+    func hideLoadingIndicator() {
     
     }
     
-    override func showNetworkError(message: String) {
+    func showNetworkError(message: String) {
     
     }
 }

@@ -9,7 +9,7 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
-    private weak var viewController: MovieQuizViewController?
+    var viewController: MovieQuizViewControllerProtocol?
     var questionFactory: QuestionFactoryProtocol?
     private let statisticService: StatisticService!
     
@@ -18,8 +18,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestion: QuizQuestion?
     private var correctAnswers: Int = 0
     
-    init(viewController: MovieQuizViewController) {
-         self.viewController = viewController
+    init(viewController: MovieQuizViewControllerProtocol) {
+        self.viewController = viewController
         
          statisticService = StatisticServiceImplementation()
          questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
@@ -55,7 +55,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)" // ОШИБКА: `currentQuestionIndex` и `questionsAmount` неопределены
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)" 
         )
     }
     
